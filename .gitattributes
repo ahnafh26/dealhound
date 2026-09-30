@@ -1,0 +1,4 @@
+# Keep LF line endings on every OS, so Windows checkouts and Linux builds (Vercel) agree.
+* text=auto eol=lf
+*.png binary
+*.ico binary

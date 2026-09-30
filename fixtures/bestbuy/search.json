@@ -1,0 +1,45 @@
+{
+  "from": 1,
+  "to": 4,
+  "currentPage": 1,
+  "total": 4,
+  "totalPages": 1,
+  "products": [
+    {
+      "sku": 6600001,
+      "name": "Apple - MacBook Air 13-inch Laptop - M4 chip - 16GB Memory - 256GB SSD - Midnight",
+      "salePrice": 999.99,
+      "url": "https://www.bestbuy.com/site/apple-macbook-air-13-m4/6600001.p?skuId=6600001",
+      "image": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/demo1.jpg",
+      "condition": "New",
+      "freeShipping": true,
+      "shippingCost": 0
+    },
+    {
+      "sku": 6600002,
+      "name": "Apple - Refurbished MacBook Air 13-inch - M4 chip - 16GB Memory - 256GB SSD",
+      "salePrice": 849.99,
+      "url": "https://www.bestbuy.com/site/apple-macbook-air-13-m4-refurbished/6600002.p?skuId=6600002",
+      "image": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/demo2.jpg",
+      "condition": "Refurbished",
+      "freeShipping": false,
+      "shippingCost": 9.99
+    },
+    {
+      "sku": 6600003,
+      "name": "Apple - MacBook Air 15-inch Laptop - M4 chip - 16GB Memory - 512GB SSD - Sky Blue",
+      "salePrice": 1399.99,
+      "url": "https://www.bestbuy.com/site/apple-macbook-air-15-m4/6600003.p?skuId=6600003",
+      "image": null,
+      "condition": "New",
+      "freeShipping": false,
+      "shippingCost": ""
+    },
+    {
+      "sku": 6600004,
+      "name": "Product without a price is skipped",
+      "url": "https://www.bestbuy.com/site/6600004.p",
+      "condition": "New"
+    }
+  ]
+}

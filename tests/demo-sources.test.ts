@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { runSource } from '@/lib/search';
-import { createDemoAdapter, DEMO_SOURCES, parseDemoFixture, relevance } from '@/lib/sources/demo';
+import { createDemoAdapter, DEMO_SOURCES, parseDemoFixture } from '@/lib/sources/demo';
+import { relevance } from '@/lib/sources/parse';
 import { planSources } from '@/lib/sources';
 import { passthroughSpec } from '@/lib/spec';
 import type { SourceAdapter } from '@/lib/types';

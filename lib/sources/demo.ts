@@ -9,6 +9,7 @@ import { sleep } from '@/lib/async';
 import { demoMode, simulatedFailure } from '@/lib/env';
 import { ChannelSchema, ListingSchema } from '@/lib/schemas';
 import type { Channel, Listing, SourceAdapter, SourceType } from '@/lib/types';
+import { relevance } from './parse';
 
 /**
  * Fixture-backed stand-ins for real sources, so the app runs with zero API
@@ -111,25 +112,4 @@ export const demoAdapters: SourceAdapter[] = DEMO_SOURCES.map(createDemoAdapter)
 
 function jitter(ms: number): number {
   return Math.round(ms * (0.75 + Math.random() * 0.5));
-}
-
-const STOPWORDS = new Set(['the', 'and', 'for', 'with', 'in', 'of', 'on']);
-
-export function tokenize(text: string): string[] {
-  return text
-    .toLowerCase()
-    .replace(/(\d+)\s*(gb|tb)\b/g, '$1$2')
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length > 1 && !STOPWORDS.has(token));
-}
-
-/** Share of the query's words found in the title: a crude stand-in for a source's own search. */
-export function relevance(query: string, title: string): number {
-  const wanted = tokenize(query);
-  if (wanted.length === 0) return 0;
-  const have = tokenize(title);
-  const found = wanted.filter((word) =>
-    have.some((token) => token === word || (word.length >= 3 && token.includes(word))),
-  );
-  return found.length / wanted.length;
 }

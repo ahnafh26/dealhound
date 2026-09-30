@@ -19,6 +19,11 @@ export function missingEnv(names: readonly string[]): string[] {
   return names.filter((name) => !readEnv(name));
 }
 
+/** True when the variable is 1, true, yes or on. */
+export function isEnabled(name: string): boolean {
+  return /^(?:1|true|yes|on)$/i.test(readEnv(name) ?? '');
+}
+
 export function defaultRegion(): RegionCode {
   const value = readEnv('DEFAULT_REGION')?.toUpperCase();
   return isRegionCode(value) ? value : FALLBACK_REGION;

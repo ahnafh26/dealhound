@@ -1,0 +1,70 @@
+{
+  "search_metadata": { "status": "Success" },
+  "search_parameters": { "engine": "google_shopping", "q": "MacBook Air M4", "gl": "ca", "hl": "en" },
+  "shopping_results": [
+    {
+      "position": 1,
+      "title": "Apple MacBook Air 13-inch (M4, 2025) 16GB RAM 256GB SSD - Midnight",
+      "product_id": "8250000000000000001",
+      "product_link": "https://www.google.ca/shopping/product/8250000000000000001?gl=ca",
+      "link": "https://www.bestbuy.ca/en-ca/product/apple-macbook-air-13-m4/18900001",
+      "source": "Best Buy",
+      "price": "$1,399.99",
+      "extracted_price": 1399.99,
+      "delivery": "Free delivery by Oct 3",
+      "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:demo1"
+    },
+    {
+      "position": 2,
+      "title": "MacBook Air 13\" Apple M4 chip 16GB/256GB Sky Blue",
+      "product_id": "8250000000000000001",
+      "product_link": "https://www.google.ca/shopping/product/8250000000000000001?gl=ca",
+      "link": "https://www.costco.ca/macbook-air-m4.product.100000001.html",
+      "source": "Costco",
+      "price": "$1,249.99",
+      "extracted_price": 1249.99,
+      "extensions": ["Sale", "Free shipping"],
+      "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:demo2"
+    },
+    {
+      "position": 3,
+      "title": "Apple MacBook Air M4 13in 16GB 256GB Midnight (Renewed)",
+      "product_id": "8250000000000000002",
+      "product_link": "https://www.google.ca/shopping/product/8250000000000000002?gl=ca",
+      "source": "Amazon.ca - Seller",
+      "price": "$1,089.00",
+      "extracted_price": 1089,
+      "delivery": "$14.99 delivery",
+      "second_hand_condition": "refurbished",
+      "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:demo3"
+    },
+    {
+      "position": 4,
+      "title": "Apple MacBook Air 13 M4 16GB 256GB - Like New",
+      "product_id": "8250000000000000003",
+      "link": "https://www.ebay.ca/itm/306000000009",
+      "source": "eBay - mapleleaf_macs",
+      "price": "$1,049.00",
+      "extracted_price": 1049,
+      "second_hand_condition": "used",
+      "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:demo4"
+    },
+    {
+      "position": 5,
+      "title": "Apple MacBook Air 15-inch M4 16GB 512GB - Open Box",
+      "product_id": "8250000000000000004",
+      "link": "https://www.visions.ca/apple-macbook-air-15-m4-open-box",
+      "source": "Visions Electronics",
+      "price": "$1,849.99",
+      "extracted_price": 1849.99,
+      "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:demo5"
+    },
+    {
+      "position": 6,
+      "title": "Result without a price is skipped",
+      "product_id": "8250000000000000005",
+      "link": "https://www.example.com/no-price",
+      "source": "Somewhere"
+    }
+  ]
+}

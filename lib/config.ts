@@ -26,6 +26,16 @@ export const CACHE = {
   maxEntries: 500,
 };
 
+export const POLITENESS = {
+  /** Gap between two requests to one host. APIs need little; scraped pages get room to breathe. */
+  minIntervalMs: { dealhound: 500, browser: 3_000 },
+  /** After a site refuses (HTTP 403 or 429, a login wall), leave it alone this long. */
+  blockCooldownMs: 30 * 60_000,
+  robotsCacheMs: 24 * 60 * 60_000,
+  /** Scraped results change slowly, and every request costs the site something. */
+  scrapeCacheTtlMs: 30 * 60_000,
+};
+
 export const LLM = {
   /** The parser runs before every search, so it gets a short leash; rules take over on timeout. */
   specTimeoutMs: 8_000,

@@ -2,7 +2,7 @@ import 'server-only';
 
 import { POLITENESS } from '@/lib/config';
 import { isEnabled, readEnv } from '@/lib/env';
-import { politeFetch, reportBlocked, useFixtures } from '@/lib/http';
+import { politeFetch, reportBlocked, fixtureMode } from '@/lib/http';
 import type { Condition, Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 import { stripHtml, truncate } from './parse';
 
@@ -41,7 +41,7 @@ export const kijiji: SourceAdapter = {
   type: 'marketplace',
   regions: ['CA'],
   cacheTtlMs: POLITENESS.scrapeCacheTtlMs,
-  enabled: () => useFixtures() || isEnabled('KIJIJI_ENABLED'),
+  enabled: () => fixtureMode() || isEnabled('KIJIJI_ENABLED'),
   disabledReason: () => 'Off: set KIJIJI_ENABLED=1 to read its search pages',
   async search(spec, { region, signal, limit }) {
     const response = await politeFetch(kijijiSearchUrl(spec.searchQuery, region), {

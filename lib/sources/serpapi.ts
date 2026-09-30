@@ -2,7 +2,7 @@ import 'server-only';
 
 import { REGIONS } from '@/lib/config';
 import { missingEnv, readEnv } from '@/lib/env';
-import { politeFetch, useFixtures } from '@/lib/http';
+import { politeFetch, fixtureMode } from '@/lib/http';
 import type { Channel, Condition, Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 import { parseMoney } from './parse';
 
@@ -20,7 +20,7 @@ export const serpapi: SourceAdapter = {
   type: 'retail',
   requiredEnv: REQUIRED,
   cacheTtlMs: 60 * 60_000,
-  enabled: () => useFixtures() || missingEnv(REQUIRED).length === 0,
+  enabled: () => fixtureMode() || missingEnv(REQUIRED).length === 0,
   async search(spec, { region, signal, limit }) {
     const country = REGIONS[region.code].googleCountry;
     const params = new URLSearchParams({

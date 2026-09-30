@@ -92,12 +92,12 @@ export function dealhoundUserAgent(): string {
   return readEnv('DEALHOUND_USER_AGENT') ?? 'DealHound/0.1 (personal price comparison)';
 }
 
-export function useFixtures(): boolean {
+export function fixtureMode(): boolean {
   return isEnabled('USE_FIXTURES');
 }
 
 export async function politeFetch(url: string, request: PoliteRequest): Promise<PoliteResponse> {
-  if (useFixtures()) {
+  if (fixtureMode()) {
     if (!request.fixture) throw new Error(`Offline (USE_FIXTURES=1): no fixture for ${new URL(url).pathname}`);
     return { status: 200, ok: true, text: await readFixture(request.source, request.fixture) };
   }

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { missingEnv, readEnv } from '@/lib/env';
-import { politeFetch, useFixtures } from '@/lib/http';
+import { politeFetch, fixtureMode } from '@/lib/http';
 import type { Condition, Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 
 /**
@@ -17,7 +17,7 @@ export const bestbuy: SourceAdapter = {
   type: 'retail',
   requiredEnv: REQUIRED,
   regions: ['US'],
-  enabled: () => useFixtures() || missingEnv(REQUIRED).length === 0,
+  enabled: () => fixtureMode() || missingEnv(REQUIRED).length === 0,
   async search(spec, { region, signal, limit }) {
     // Best Buy's query language: products((search=macbook&search=air)). Words only.
     const words = spec.searchQuery

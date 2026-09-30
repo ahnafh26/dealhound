@@ -2,7 +2,7 @@ import 'server-only';
 
 import { POLITENESS } from '@/lib/config';
 import { isEnabled, readEnv } from '@/lib/env';
-import { politeFetch, reportBlocked, useFixtures } from '@/lib/http';
+import { politeFetch, reportBlocked, fixtureMode } from '@/lib/http';
 import type { Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 import { parseMoney, unescapeJsonString } from './parse';
 
@@ -30,7 +30,7 @@ export const facebookMarketplace: SourceAdapter = {
   type: 'marketplace',
   regions: ['CA'],
   cacheTtlMs: POLITENESS.scrapeCacheTtlMs,
-  enabled: () => useFixtures() || isEnabled('FACEBOOK_ENABLED'),
+  enabled: () => fixtureMode() || isEnabled('FACEBOOK_ENABLED'),
   disabledReason: () => 'Off: set FACEBOOK_ENABLED=1 to read its logged-out search page',
   async search(spec, { region, signal, limit }) {
     const override = readEnv('FACEBOOK_CITY');

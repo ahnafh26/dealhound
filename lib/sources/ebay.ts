@@ -2,7 +2,7 @@ import 'server-only';
 
 import { REGIONS } from '@/lib/config';
 import { missingEnv, readEnv } from '@/lib/env';
-import { politeFetch, useFixtures } from '@/lib/http';
+import { politeFetch, fixtureMode } from '@/lib/http';
 import type { Condition, Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 import { stripHtml, truncate } from './parse';
 
@@ -21,14 +21,14 @@ export const ebay: SourceAdapter = {
   name: 'eBay',
   type: 'marketplace',
   requiredEnv: REQUIRED,
-  enabled: () => useFixtures() || missingEnv(REQUIRED).length === 0,
+  enabled: () => fixtureMode() || missingEnv(REQUIRED).length === 0,
   async search(spec, { region, signal, limit }) {
     const params = new URLSearchParams({
       q: spec.searchQuery,
       limit: String(Math.min(limit, 200)),
       filter: `buyingOptions:{FIXED_PRICE},deliveryCountry:${region.code}`,
     });
-    const token = useFixtures() ? 'offline' : await accessToken();
+    const token = fixtureMode() ? 'offline' : await accessToken();
     const response = await politeFetch(`${API}/buy/browse/v1/item_summary/search?${params}`, {
       source: 'ebay',
       fixture: 'search.json',

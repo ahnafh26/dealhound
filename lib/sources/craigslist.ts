@@ -2,7 +2,7 @@ import 'server-only';
 
 import { POLITENESS } from '@/lib/config';
 import { isEnabled, readEnv } from '@/lib/env';
-import { politeFetch, useFixtures } from '@/lib/http';
+import { politeFetch, fixtureMode } from '@/lib/http';
 import type { Listing, SearchRegion, SourceAdapter } from '@/lib/types';
 
 /**
@@ -51,7 +51,7 @@ export const craigslist: SourceAdapter = {
   type: 'marketplace',
   regions: ['CA'],
   cacheTtlMs: POLITENESS.scrapeCacheTtlMs,
-  enabled: () => useFixtures() || isEnabled('CRAIGSLIST_ENABLED'),
+  enabled: () => fixtureMode() || isEnabled('CRAIGSLIST_ENABLED'),
   disabledReason: () => 'Off: set CRAIGSLIST_ENABLED=1 to read its public search feed',
   async search(spec, { region, signal, limit }) {
     const areas = areasFor(region);
@@ -80,7 +80,7 @@ export const craigslist: SourceAdapter = {
       });
       if (!response.ok) throw new Error(`Craigslist returned HTTP ${response.status}`);
       listings.push(...parseCraigslistFeed(JSON.parse(response.text), area, region));
-      if (useFixtures()) break;
+      if (fixtureMode()) break;
     }
     return listings.slice(0, limit);
   },

@@ -30,15 +30,16 @@ afterEach(() => {
 describe('politeFetch', () => {
   it('spaces requests to the same host, but not across hosts', async () => {
     mockFetch(() => new Response('ok'));
-    const request = { source: 'test', fixture: 'x', signal: signal(), minIntervalMs: 60 };
+    const request = { source: 'test', fixture: 'x', signal: signal(), minIntervalMs: 300 };
 
     const started = Date.now();
     await politeFetch('https://a.example/1', request);
     await politeFetch('https://b.example/1', request);
-    expect(Date.now() - started).toBeLessThan(50);
+    expect(Date.now() - started).toBeLessThan(250);
 
     await politeFetch('https://a.example/2', request);
-    expect(Date.now() - started).toBeGreaterThanOrEqual(55);
+    // Timers can fire a few ms early on some platforms.
+    expect(Date.now() - started).toBeGreaterThanOrEqual(290);
   });
 
   it('backs off from a source after a 403, without asking again', async () => {

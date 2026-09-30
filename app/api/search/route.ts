@@ -12,7 +12,7 @@ import type { SearchEvent } from '@/lib/types';
 export const maxDuration = 30;
 
 /**
- * POST { query, postalCode?, region? } → text/event-stream of SearchEvents.
+ * POST { query, postalCode?, region?, clarify? } → text/event-stream of SearchEvents.
  * Each source's results are sent the moment that source answers.
  */
 export async function POST(request: Request) {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request.' }, { status: 400 });
   }
-  const { query, postalCode, region: regionCode } = parsed.data;
+  const { query, postalCode, region: regionCode, clarify } = parsed.data;
   const region = resolveRegion(regionCode ?? defaultRegion(), postalCode ?? defaultPostalCode());
 
   // Stops outstanding source requests when the shopper navigates away or starts a new search.
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       };
 
       try {
-        const result = await parseQuery(query);
+        const result = await parseQuery(query, { allowClarify: clarify !== false, signal: abort.signal });
         if (result.kind === 'clarify') {
           send({ type: 'clarify', question: result.question });
           return;
@@ -66,8 +66,11 @@ export async function POST(request: Request) {
         );
         send({ type: 'done', ms: Date.now() - started, total });
       } catch (err) {
-        console.error('[api/search] failed', err);
-        send({ type: 'error', message: 'Search failed unexpectedly. Please try again.' });
+        // A cancelled search (new query, closed tab) is not a failure.
+        if (!abort.signal.aborted) {
+          console.error('[api/search] failed', err);
+          send({ type: 'error', message: 'Search failed unexpectedly. Please try again.' });
+        }
       } finally {
         try {
           controller.close();

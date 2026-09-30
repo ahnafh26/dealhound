@@ -8,6 +8,7 @@ import type { ClarifyingQuestion, ClientListing, ProductSpec, SearchEvent, Sourc
 import { landedPrice, ListingTable } from './ListingTable';
 import { SearchForm } from './SearchForm';
 import { SourceStatusList } from './SourceStatusList';
+import { SpecSummary } from './SpecSummary';
 
 interface SearchAppProps {
   region: RegionConfig;
@@ -77,9 +78,15 @@ function applyEvent(state: SearchState, event: SearchEvent): SearchState {
   }
 }
 
+interface StreamRequest {
+  query: string;
+  postalCode: string;
+  /** false: search as typed, even if the query is ambiguous. */
+  clarify?: boolean;
+}
+
 async function streamSearch(
-  query: string,
-  postalCode: string,
+  { query, postalCode, clarify }: StreamRequest,
   signal: AbortSignal,
   dispatch: (action: Action) => void,
 ): Promise<void> {
@@ -87,7 +94,7 @@ async function streamSearch(
     const response = await fetch('/api/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, postalCode: postalCode.trim() || undefined }),
+      body: JSON.stringify({ query, postalCode: postalCode.trim() || undefined, clarify }),
       signal,
     });
     if (!response.ok || !response.body) {
@@ -154,29 +161,29 @@ export function SearchApp({ region, initialQuery, initialSources, defaultPostalC
   const postalCode = postalCodeDraft ?? savedPostalCode ?? defaultPostalCode;
 
   const controllerRef = useRef<AbortController | null>(null);
-  const startStream = useCallback((searchQuery: string, searchPostalCode: string) => {
+  const startStream = useCallback((request: StreamRequest) => {
     controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;
-    void streamSearch(searchQuery, searchPostalCode, controller.signal, dispatch);
+    void streamSearch(request, controller.signal, dispatch);
     return controller;
   }, []);
 
   // A search linked by URL runs on load; state already starts as 'searching'.
   useEffect(() => {
     if (!initialQuery) return;
-    const controller = startStream(initialQuery, readSavedPostalCode() ?? defaultPostalCode);
+    const controller = startStream({ query: initialQuery, postalCode: readSavedPostalCode() ?? defaultPostalCode });
     return () => controller.abort();
   }, [initialQuery, defaultPostalCode, startStream]);
 
-  function search(rawQuery: string) {
+  function search(rawQuery: string, { clarify }: { clarify?: boolean } = {}) {
     const searchQuery = rawQuery.replace(/\s+/g, ' ').trim();
     if (searchQuery.length < 2) return;
     setQuery(searchQuery);
     if (postalCodeDraft !== null) savePostalCode(postalCodeDraft);
     dispatch({ type: 'start', query: searchQuery });
     window.history.replaceState(null, '', `?q=${encodeURIComponent(searchQuery)}`);
-    startStream(searchQuery, postalCode);
+    startStream({ query: searchQuery, postalCode, clarify });
   }
 
   const listings = useMemo(
@@ -224,14 +231,22 @@ export function SearchApp({ region, initialQuery, initialSources, defaultPostalC
           )}
 
           {state.clarify ? (
-            <ClarifyPrompt question={state.clarify} onPick={search} />
+            <ClarifyPrompt
+              question={state.clarify}
+              query={state.query}
+              onPick={search}
+              onSearchAsTyped={() => search(state.query, { clarify: false })}
+            />
           ) : (
             (state.phase !== 'failed' || listings.length > 0) && (
               <>
+                {state.spec && <SpecSummary spec={state.spec} />}
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h2 id="results-heading" className="text-lg font-semibold">
                     {searching && listings.length === 0
-                      ? 'Searching…'
+                      ? state.spec
+                        ? 'Searching…'
+                        : 'Reading your search…'
                       : `${listings.length} listing${listings.length === 1 ? '' : 's'}`}
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -263,13 +278,21 @@ export function SearchApp({ region, initialQuery, initialSources, defaultPostalC
   );
 }
 
-function ClarifyPrompt({ question, onPick }: { question: ClarifyingQuestion; onPick(query: string): void }) {
+interface ClarifyPromptProps {
+  question: ClarifyingQuestion;
+  /** What the shopper typed. */
+  query: string;
+  onPick(query: string): void;
+  onSearchAsTyped(): void;
+}
+
+function ClarifyPrompt({ question, query, onPick, onSearchAsTyped }: ClarifyPromptProps) {
   return (
     <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-900/60 dark:bg-sky-950/40">
       <h2 id="results-heading" className="font-semibold text-sky-950 dark:text-sky-100">
         {question.question}
       </h2>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {question.options.map((option) => (
           <button
             key={option.query}
@@ -280,6 +303,13 @@ function ClarifyPrompt({ question, onPick }: { question: ClarifyingQuestion; onP
             {option.label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={onSearchAsTyped}
+          className="px-2 py-1.5 text-sm text-sky-800 underline decoration-sky-300 underline-offset-2 hover:decoration-sky-700 dark:text-sky-300 dark:decoration-sky-700"
+        >
+          Search “{query}” as typed
+        </button>
       </div>
     </div>
   );

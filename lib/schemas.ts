@@ -44,6 +44,8 @@ export const SearchRequestSchema = z.object({
     .max(SEARCH.queryMaxLength, `Keep it under ${SEARCH.queryMaxLength} characters.`),
   postalCode: z.string().trim().max(12).optional(),
   region: z.enum(REGION_CODES).optional(),
+  /** false: search the query as typed, never answer with a clarifying question. */
+  clarify: z.boolean().optional(),
 });
 
 export type SearchRequest = z.infer<typeof SearchRequestSchema>;

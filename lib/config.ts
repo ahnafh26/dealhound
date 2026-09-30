@@ -26,6 +26,13 @@ export const CACHE = {
   maxEntries: 500,
 };
 
+export const LLM = {
+  /** The parser runs before every search, so it gets a short leash; rules take over on timeout. */
+  specTimeoutMs: 8_000,
+  /** How a query reads doesn't change, so one LLM reading is reused for a day. */
+  specCacheTtlMs: 24 * 60 * 60_000,
+};
+
 // ─── Regions ─────────────────────────────────────────────────────────────
 
 export interface RegionConfig {

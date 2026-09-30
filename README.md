@@ -8,7 +8,7 @@ true_cost = price + shipping + estimated_tax + risk_penalty − warranty_value
 
 A $1,000 used laptop from a stranger with no photos is not cheaper than a $1,100 certified refurb with a one-year warranty, and DealHound's job is to show that.
 
-**Status:** Phase 1 of 6 (scaffold, types, config, demo data, streaming search). See [Roadmap](#roadmap).
+**Status:** Phase 2 of 6 (query parsing with rules and a cheap LLM, clarifying questions). See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -32,7 +32,7 @@ Open http://localhost:3000 and try **M4 MacBook Air 16GB** or **Sony WH-1000XM5*
 
 ## How it works
 
-1. **Spec parser** (`lib/spec.ts`) turns the query into a structured `ProductSpec`, or asks one clarifying question when a critical attribute is ambiguous (Air or Pro?). *Currently a passthrough; the LLM parser arrives in phase 2.*
+1. **Spec parser** (`lib/spec.ts`) turns the query into a structured `ProductSpec`: brand, model, the specs a listing must have (`{ chip: 'M4', ram: '16GB' }`) and a short search string for the stores. If a detail that changes the product is ambiguous (MacBook Air or Pro?), it asks one clarifying question instead of guessing. Rules (`lib/spec-rules.ts`) read common products for free and instantly. Only the queries they can't place go to the LLM, and its answers are cached for a day. See [LLM](#llm-query-parsing-and-later-matching).
 2. **Fan-out** (`lib/search.ts`) queries every enabled source in parallel with a 6-second deadline each. Results stream to the browser as Server-Sent Events the moment each source answers. A source that throws, hangs, or returns malformed data is reported as failed and never breaks the search.
 3. **Matcher** (`lib/match.ts`, phase 4) keeps listings that match the spec: cheap keyword rules first ("for parts", "box only", "iCloud locked", wrong chip), then an LLM in batches for the uncertain ones.
 4. **Scorer** (`lib/score.ts`, phase 4) computes true cost for each match.
@@ -40,13 +40,19 @@ Open http://localhost:3000 and try **M4 MacBook Air 16GB** or **Sony WH-1000XM5*
 
 ### The streaming API
 
-`POST /api/search` with `{ "query": "…", "postalCode"?: "…", "region"?: "CA" | "US" }` returns `text/event-stream`. Each `data:` line is one JSON `SearchEvent` (see `lib/types.ts`), in this order:
+`POST /api/search` with `{ "query": "…", "postalCode"?: "…", "region"?: "CA" | "US", "clarify"?: false }` returns `text/event-stream`. Each `data:` line is one JSON `SearchEvent` (see `lib/types.ts`), in this order:
 
 ```
 spec → sources → (source, listings)* → done
 ```
 
-`sources` lists every adapter as `pending` or `skipped` (with the reason). Each `source` event reports one adapter finishing as `ok`, `error`, or `timeout`. A query that needs clarifying emits `clarify` instead of `spec`.
+`sources` lists every adapter as `pending` or `skipped` (with the reason). Each `source` event reports one adapter finishing as `ok`, `error`, or `timeout`. A query that needs clarifying emits a single `clarify` event instead, whose options are ready-to-run refined queries. Send `"clarify": false` to search the query as typed.
+
+`POST /api/clarify` with `{ "query": "…" }` returns the same reading as plain JSON without searching, which is handy for checking how a query will be understood:
+
+```bash
+curl -s localhost:3000/api/clarify -H 'content-type: application/json' -d '{"query":"Sony XM5"}'
+```
 
 ## True cost and tuning
 
@@ -84,14 +90,20 @@ Covers most Canadian retailers (Best Buy, Amazon, Walmart, Costco, Staples, …)
 
 Results are cached per query (10 minutes by default) to stretch the quota.
 
-### OpenAI (`OPENAI_API_KEY`) or Anthropic (`ANTHROPIC_API_KEY`)
+### LLM: query parsing (and, later, matching)
 
-Used for spec parsing and matching (phases 2 and 4). Set `LLM_PROVIDER` to `openai` or `anthropic`.
+DealHound works without any LLM: rules read the products they know (MacBooks, iPhones, Sony's 1000X headphones) and extract the usual specs from anything else. An LLM only improves queries the rules can't place, so it's set up to be as cheap as possible:
 
-- OpenAI: create a key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys). API usage is billed separately from ChatGPT.
-- Anthropic: create a key at [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys).
+| `LLM_PROVIDER` | Model | Price per 1M tokens (in / out, Sept 2026) | Key |
+| --- | --- | --- | --- |
+| `openai` (default) | `gpt-5-nano`, minimal reasoning | $0.05 / $0.40 | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) → `OPENAI_API_KEY` |
+| `gemini` | `gemini-2.5-flash-lite`, thinking off | free within Google's daily limits, then $0.10 / $0.40 | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) → `GEMINI_API_KEY` |
+| `custom` | anything OpenAI-compatible (Groq, OpenRouter, Ollama) | varies | `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL` |
+| `none` | rules only | $0 | none |
 
-Without a key, DealHound falls back to rule-based parsing and matching.
+Reading a query takes about 1,000 input tokens (mostly the fixed instructions and schema) and 200 output tokens, so gpt-5-nano costs roughly $0.0001 per query the rules can't place: about $1 for 7,500 of them. Cached repeats cost nothing. OpenAI API usage is billed separately from ChatGPT and needs a few dollars of prepaid credit. Anthropic's cheapest model (Claude Haiku 4.5, $1 / $5) costs about 20× more for this job, so it isn't wired up.
+
+All providers go through one small OpenAI-compatible client (`lib/llm.ts`) with strict JSON-schema output, validated with Zod. If the LLM errors, times out (8 s) or returns something off-schema, the rules' reading is used instead.
 
 ### Other sources
 
@@ -176,14 +188,18 @@ The in-memory cache lives per server instance, so on Vercel each instance keeps 
 app/
   page.tsx              Search page (server component: region, source list)
   api/search/route.ts   Streaming search endpoint (SSE)
-components/             Client UI: search form, source status, listing table
+  api/clarify/route.ts  How a query will be read, as JSON, without searching
+components/             Client UI: search form, source status, spec summary, listing table
 lib/
   types.ts              Listing, ScoredListing, ProductSpec, SourceAdapter, events
   config.ts             Every tunable number: timeouts, tax rates, risk and warranty weights
   schemas.ts            Zod schemas for data crossing trust boundaries
   search.ts             Parallel fan-out with per-source deadline, cache, validation
   sources/              One file per adapter, plus the registry (index.ts)
-  spec.ts               Query → ProductSpec (LLM in phase 2)
+  spec.ts               Query → ProductSpec or a clarifying question (rules, then LLM)
+  spec-rules.ts         The free rules reader: known product families + spec extraction
+  attributes.ts         Shared attribute names and value formats ("16 gb" → "16GB")
+  llm.ts                Tiny OpenAI-compatible client for JSON-only calls
   cache.ts              Async cache interface; in-memory LRU implementation
   region.ts             Postal code → province, tax lookup
   env.ts                Server-only env access
@@ -195,7 +211,7 @@ tests/                  Vitest
 ## Roadmap
 
 - [x] **1. Scaffold:** types, config, `.env.example`, fixture-backed demo sources, streaming fan-out, basic UI
-- [ ] **2. Spec parser:** LLM query → spec, one clarifying question when ambiguous, rule-based fallback
+- [x] **2. Spec parser:** rules first, the cheapest LLM for the rest, one clarifying question when ambiguous
 - [ ] **3. Real sources:** eBay, SerpAPI Google Shopping, Apple Certified Refurbished, Craigslist, with recorded fixtures
 - [ ] **4. Matcher and scorer:** rules plus batched LLM matching, true cost, tests against fixtures
 - [ ] **5. Results UI:** top picks (new / refurb / used) with a one-line why, sortable and filterable table, risk badges

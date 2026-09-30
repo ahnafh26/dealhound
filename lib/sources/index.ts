@@ -4,6 +4,7 @@ import { REGIONS } from '@/lib/config';
 import { demoMode, missingEnv } from '@/lib/env';
 import { sourceStatus } from '@/lib/search';
 import type { RegionCode, SourceAdapter, SourceStatus } from '@/lib/types';
+import { bestbuy } from './bestbuy';
 import { demoAdapters } from './demo';
 import { ebay } from './ebay';
 import { facebookMarketplace } from './facebook-marketplace';
@@ -11,7 +12,7 @@ import { kijiji } from './kijiji';
 import { serpapi } from './serpapi';
 
 /** Every source DealHound knows about, in display order. Register new adapters here. */
-export const adapters: SourceAdapter[] = [serpapi, ebay, facebookMarketplace, kijiji, ...demoAdapters];
+export const adapters: SourceAdapter[] = [serpapi, ebay, bestbuy, facebookMarketplace, kijiji, ...demoAdapters];
 
 export interface SourcePlan {
   /** Adapters to query. */

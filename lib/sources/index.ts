@@ -5,11 +5,12 @@ import { demoMode, missingEnv } from '@/lib/env';
 import { sourceStatus } from '@/lib/search';
 import type { RegionCode, SourceAdapter, SourceStatus } from '@/lib/types';
 import { demoAdapters } from './demo';
+import { ebay } from './ebay';
 import { facebookMarketplace } from './facebook-marketplace';
 import { kijiji } from './kijiji';
 
 /** Every source DealHound knows about, in display order. Register new adapters here. */
-export const adapters: SourceAdapter[] = [...demoAdapters, facebookMarketplace, kijiji];
+export const adapters: SourceAdapter[] = [ebay, facebookMarketplace, kijiji, ...demoAdapters];
 
 export interface SourcePlan {
   /** Adapters to query. */

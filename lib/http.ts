@@ -35,8 +35,12 @@ const BROWSER_HEADERS: Record<string, string> = {
 export interface PoliteRequest {
   /** Adapter id. Names the fixture folder and whose back-off applies. */
   source: string;
-  /** File under fixtures/<source>/ that records and replays this request. */
-  fixture: string;
+  /**
+   * File under fixtures/<source>/ that records and replays this request.
+   * Leave it out for requests that must never be written to disk, like
+   * fetching an access token.
+   */
+  fixture?: string;
   signal: AbortSignal;
   identity?: Identity;
   headers?: Record<string, string>;
@@ -94,6 +98,7 @@ export function useFixtures(): boolean {
 
 export async function politeFetch(url: string, request: PoliteRequest): Promise<PoliteResponse> {
   if (useFixtures()) {
+    if (!request.fixture) throw new Error(`Offline (USE_FIXTURES=1): no fixture for ${new URL(url).pathname}`);
     return { status: 200, ok: true, text: await readFixture(request.source, request.fixture) };
   }
 
@@ -125,7 +130,7 @@ export async function politeFetch(url: string, request: PoliteRequest): Promise<
   if (response.status === 403 || response.status === 429) {
     throw reportBlocked(request.source, `HTTP ${response.status}`);
   }
-  if (response.ok && isEnabled('RECORD_FIXTURES')) {
+  if (response.ok && request.fixture && isEnabled('RECORD_FIXTURES')) {
     await recordFixture(request.source, request.fixture, text);
   }
   return { status: response.status, ok: response.ok, text };

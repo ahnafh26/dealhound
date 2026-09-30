@@ -1,0 +1,73 @@
+{
+  "href": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=MacBook+Air+M4&limit=50",
+  "total": 5,
+  "limit": 50,
+  "offset": 0,
+  "itemSummaries": [
+    {
+      "itemId": "v1|306000000001|0",
+      "title": "Apple MacBook Air 13 M4 2025 16GB 256GB Midnight - Like New",
+      "price": { "value": "1049.00", "currency": "CAD" },
+      "itemWebUrl": "https://www.ebay.ca/itm/306000000001",
+      "image": { "imageUrl": "https://i.ebayimg.com/images/g/demo/s-l225.jpg" },
+      "additionalImages": [
+        { "imageUrl": "https://i.ebayimg.com/images/g/demo2/s-l225.jpg" },
+        { "imageUrl": "https://i.ebayimg.com/images/g/demo3/s-l225.jpg" }
+      ],
+      "condition": "Used",
+      "conditionId": "3000",
+      "seller": { "username": "mapleleaf_macs", "feedbackPercentage": "99.8", "feedbackScore": 1240 },
+      "shippingOptions": [{ "shippingCostType": "FIXED", "shippingCost": { "value": "25.00", "currency": "CAD" } }],
+      "itemLocation": { "city": "Mississauga", "stateOrProvince": "Ontario", "country": "CA" },
+      "buyingOptions": ["FIXED_PRICE"],
+      "itemCreationDate": "2026-09-24T18:05:00.000Z"
+    },
+    {
+      "itemId": "v1|306000000002|0",
+      "title": "Apple MacBook Air 13 M4 16GB 256GB Silver - Excellent - Refurbished",
+      "price": { "value": "1119.00", "currency": "CAD" },
+      "itemWebUrl": "https://www.ebay.ca/itm/306000000002",
+      "image": { "imageUrl": "https://i.ebayimg.com/images/g/demo4/s-l225.jpg" },
+      "condition": "Excellent - Refurbished",
+      "conditionId": "2010",
+      "seller": { "username": "certified_renew_ca", "feedbackPercentage": "99.3", "feedbackScore": 4150 },
+      "shippingOptions": [{ "shippingCostType": "FIXED", "shippingCost": { "value": "0.00", "currency": "CAD" } }],
+      "itemLocation": { "city": "Markham", "stateOrProvince": "Ontario", "country": "CA" },
+      "buyingOptions": ["FIXED_PRICE", "BEST_OFFER"],
+      "itemCreationDate": "2026-09-23T14:00:00.000Z"
+    },
+    {
+      "itemId": "v1|306000000003|0",
+      "title": "Apple MacBook Air M4 13\" 16GB 256GB - FOR PARTS - cracked screen",
+      "price": { "value": "420.00", "currency": "CAD" },
+      "itemWebUrl": "https://www.ebay.ca/itm/306000000003",
+      "image": { "imageUrl": "https://i.ebayimg.com/images/g/demo5/s-l225.jpg" },
+      "condition": "For parts or not working",
+      "conditionId": "7000",
+      "seller": { "username": "fixit_ottawa", "feedbackPercentage": "99.1", "feedbackScore": 530 },
+      "shippingOptions": [{ "shippingCostType": "CALCULATED" }],
+      "itemLocation": { "city": "Ottawa", "stateOrProvince": "Ontario", "country": "CA" },
+      "buyingOptions": ["FIXED_PRICE"],
+      "itemCreationDate": "2026-09-25T20:30:00.000Z"
+    },
+    {
+      "itemId": "v1|306000000004|0",
+      "title": "NEW SEALED Apple MacBook Air M4 13 16GB 256GB",
+      "price": { "value": "1249.99", "currency": "CAD" },
+      "itemWebUrl": "https://www.ebay.ca/itm/306000000004",
+      "condition": "New",
+      "conditionId": "1000",
+      "seller": { "username": "northstar_electronics", "feedbackPercentage": "100.0", "feedbackScore": 88 },
+      "shippingOptions": [{ "shippingCostType": "FIXED", "shippingCost": { "value": "14.99", "currency": "CAD" } }],
+      "itemLocation": { "country": "US" },
+      "buyingOptions": ["FIXED_PRICE"],
+      "itemCreationDate": "2026-09-28T09:12:00.000Z"
+    },
+    {
+      "itemId": "v1|306000000005|0",
+      "title": "Listing without a price is skipped",
+      "itemWebUrl": "https://www.ebay.ca/itm/306000000005",
+      "conditionId": "3000"
+    }
+  ]
+}

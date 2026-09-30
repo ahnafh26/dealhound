@@ -1,0 +1,18 @@
+{
+  "data": {
+    "decode": {
+      "minPostingId": 7880000000,
+      "minPostedDate": 1790000000,
+      "locations": [0, [25, "toronto"], [213, "hamilton"]],
+      "locationDescriptions": [0, "Leslieville", "Scarborough", "call 416 555 0100"]
+    },
+    "items": [
+      [101, 3600, 71, 1000, "1:1~43.66~-79.33", 0, [13, "7880000101"], [4, "3:00a0a_demo1", "00b0b_demo2"], [6, "toronto-m4-macbook-air-16gb-256gb-barely"], "M4 MacBook Air 16GB 256GB - barely used"],
+      [102, 5400, 71, 700, "1:2~43.77~-79.25", 0, [13, "7880000102"], [6, "toronto-macbook-air-m4"], "macbook air m4"],
+      [103, 7200, 71, 1650, "2:3~43.25~-79.87", 0, [13, "7880000103"], [4, "00c0c_demo3"], [6, "hamilton-macbook-pro-m4-14-16gb-512gb"], "MacBook Pro M4 14\" 16GB 512GB space black"],
+      [104, 9000, 71, 0, "1:1~43.66~-79.33", 0, [13, "7880000104"], [6, "toronto-macbook-case"], "Item with no price is skipped"],
+      [105, 9100, 71, 450, "1:0~43.70~-79.40", 0, [6, "toronto-missing-token"], "Item without a URL token is skipped"]
+    ],
+    "totalResultCount": 5
+  }
+}

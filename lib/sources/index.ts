@@ -4,6 +4,7 @@ import { REGIONS } from '@/lib/config';
 import { demoMode, missingEnv } from '@/lib/env';
 import { sourceStatus } from '@/lib/search';
 import type { RegionCode, SourceAdapter, SourceStatus } from '@/lib/types';
+import { appleRefurb } from './apple-refurb';
 import { bestbuy } from './bestbuy';
 import { craigslist } from './craigslist';
 import { demoAdapters } from './demo';
@@ -16,6 +17,7 @@ import { serpapi } from './serpapi';
 export const adapters: SourceAdapter[] = [
   serpapi,
   ebay,
+  appleRefurb,
   bestbuy,
   facebookMarketplace,
   kijiji,
